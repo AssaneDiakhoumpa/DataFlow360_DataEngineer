@@ -19,9 +19,11 @@ L’objectif principal est de construire une **pipeline de collecte robuste, con
 
 ###  Vue d’ensemble
 
-![Architecture de Collecte & Ingestion](./Collecte_injection.drawio.png)
+![Architecture de Collecte & Ingestion]### 🌍 Vue d’ensemble
 
-Cette architecture illustre les différents canaux de collecte et leur intégration dans le pipeline Kafka.
+![Architecture de Collecte & Ingestion](assets/collecte_ingestion.png)
+
+Cette architecture illustre les différents canaux de collecte et leur intégration dans le pipeline Multi-Source.
 
 ###  Sources de données
 | Source | Description | Technologie |
@@ -62,7 +64,7 @@ Cette architecture illustre les différents canaux de collecte et leur intégrat
 
 ### Cloner le dépôt
 ```bash
-git clone https://github.com/<votre_nom_utilisateur>/DataFlow360.git
+git clone https://github.com/<AssaneDiakhoumpa>/DataFlow360.git
 cd DataFlow360
 ````
 
@@ -82,7 +84,7 @@ docker-compose up --build
 
 ## Fonctionnement du pipeline
 
-1. Les scripts `faker_data` génèrent des données simulées.
+1. Les scripts `generate_*.py` génèrent des données simulées.
 2. Les scrapers Selenium collectent des données réelles depuis le web.
 3. Les API OpenWeather & AviationStack fournissent des données en temps réel.
 4. Toutes ces données transitent par Redis / MySQL / Cassandra selon leur nature.
