@@ -1,4 +1,12 @@
-# Ignorer les fichiers sensibles
-.env
+# Environnement virtuel
+monenv/
+venv/
+.env/
+
+# Fichiers temporaires
 __pycache__/
 *.pyc
+
+# Données volumineuses
+data/
+logs/
