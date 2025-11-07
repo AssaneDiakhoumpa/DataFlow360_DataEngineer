@@ -19,8 +19,6 @@ L’objectif principal est de construire une **pipeline de collecte robuste, con
 
 ###  Vue d’ensemble
 
-![Architecture de Collecte & Ingestion]### 🌍 Vue d’ensemble
-
 ![Architecture de Collecte & Ingestion](assets/Collecte_injection.drawio.png)
 
 Cette architecture illustre les différents canaux de collecte et leur intégration dans le pipeline Multi-Source.
