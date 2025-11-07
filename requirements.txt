@@ -1,0 +1,25 @@
+# === Base de données Cassandra ===
+cassandra-driver
+
+# === Génération de données factices ===
+Faker
+
+# === Gestion des variables d'environnement ===
+python-dotenv
+
+# === Base de données MySQL ===
+mysql-connector-python
+
+# === Kafka ===
+kafka-python
+requests
+# === Tâches planifiées ===
+apscheduler pytz
+# === Selenium pour le scraping web ===
+selenium
+# === Manipulation des données ===
+pandas
+# === Redis ===
+redis
+
+

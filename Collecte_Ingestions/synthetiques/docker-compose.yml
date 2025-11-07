@@ -1,0 +1,66 @@
+services:
+  # ==============================
+  # 🔹 Service Cassandra
+  # ==============================
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=Rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=100M
+    ports:
+      - "9042:9042"     # Port CQL (pour cqlsh, drivers, etc.)
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    networks:
+      - cassandra-net
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe keyspaces' 127.0.0.1 9042 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # ==============================
+  # 🔹 Service MySQL (météo)
+  # ==============================
+  mysql-meteo:
+    image: mysql:8.0
+    container_name: mysql_meteo
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: meteo_db
+      MYSQL_USER: meteo_user
+      MYSQL_PASSWORD: meteo_pass
+    ports:
+      - "3307:3306"   # Port externe 3307 pour éviter les conflits
+    volumes:
+      - mysql_meteo_data:/var/lib/mysql
+    networks:
+      - meteo-net
+
+# ==============================
+# 🔹 Volumes persistants
+# ==============================
+volumes:
+  cassandra-data:
+  mysql_meteo_data:
+
+# ==============================
+# 🔹 Réseaux Docker
+# ==============================
+networks:
+  cassandra-net:
+    driver: bridge
+  meteo-net:
+    driver: bridge

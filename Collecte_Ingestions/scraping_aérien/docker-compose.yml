@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis-server
+    restart: always
+    ports:
+      - "6379:6379"          # Mappe le port Redis du conteneur au port 6379 local
+    volumes:
+      - redis_data:/data     # Données persistées dans un volume Docker
+
+volumes:
+  redis_data:
+    driver: local
