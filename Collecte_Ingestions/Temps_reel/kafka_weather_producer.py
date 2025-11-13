@@ -46,7 +46,7 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-print("🚀 Kafka Producer météo démarré...")
+print("Kafka Producer météo démarré...")
 
 # =============================
 # Boucle d’envoi des données
@@ -67,7 +67,7 @@ while True:
 
             # Vérifie que la réponse API contient les données attendues
             if response.status_code != 200 or "main" not in data:
-                print(f"⚠️ Erreur API pour {aeroport['ville']} : {data}")
+                print(f"Erreur API pour {aeroport['ville']} : {data}")
                 continue
 
             meteo = {
@@ -85,10 +85,10 @@ while True:
             }
 
             producer.send(TOPIC_NAME, meteo)
-            print(f"✅ Données envoyées pour {aeroport['ville']} : {meteo}")
+            print(f"Données envoyées pour {aeroport['ville']} : {meteo}")
 
         except Exception as e:
-            print(f"❌ Erreur pour {aeroport['ville']}: {e}")
+            print(f"Erreur pour {aeroport['ville']}: {e}")
 
         time.sleep(2)
 

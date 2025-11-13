@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_stack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=kinesis,dynamodb,lambda, logs
+      - DEBUG=1
+      - LOCALSTACK_PERSISTENCE=1
+      - TMPDIR=/tmp/localstack_tmp    # ✅ Changer le dossier temporaire
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - localstack_network
+
+networks:
+  localstack_network:
+    driver: bridge
+
+volumes:
+  localstack_data:

@@ -1,13 +1,14 @@
-services:
-  redis:
-    image: redis:7.0-alpine
-    container_name: redis-server
-    restart: always
-    ports:
-      - "6379:6379"          # Mappe le port Redis du conteneur au port 6379 local
-    volumes:
-      - redis_data:/data     # Données persistées dans un volume Docker
+version: '3.8'
 
-volumes:
-  redis_data:
-    driver: local
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_kinesis
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=kinesis
+      - DEBUG=1
+      - LOCALSTACK_TMPDIR=/var/lib/localstack
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

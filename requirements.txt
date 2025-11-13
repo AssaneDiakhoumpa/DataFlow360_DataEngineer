@@ -13,13 +13,14 @@ mysql-connector-python
 # === Kafka ===
 kafka-python
 requests
-# === Tâches planifiées ===
-apscheduler pytz
+# # === Tâches planifiées ===
+apscheduler
 # === Selenium pour le scraping web ===
 selenium
 # === Manipulation des données ===
 pandas
 # === Redis ===
 redis
-
+# === AWS SDK pour Python ===
+boto3
 

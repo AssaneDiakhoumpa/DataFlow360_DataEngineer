@@ -10,3 +10,12 @@ __pycache__/
 # Données volumineuses
 data/
 logs/
+# dossier AWS
+aws/
+# Fichiers de configuration locale
+.aws/
+# dossier LocalStack
+localstack/
+.localstack/ 
+# Fichier zip des lambdas
+*.zip
