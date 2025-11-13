@@ -113,3 +113,141 @@ docker-compose up --build
 
 * Intégration d’Airflow pour planifier les pipelines
 * Centralisation des logs et alertes (ELK / Prometheus)
+
+## Extension Cloud Serverless : Ingestion temps réel (AWS simulée)
+
+Cette section introduit une brique **Cloud Serverless**, simulée localement via **LocalStack**, afin de reproduire une architecture d’ingestion temps réel typique d’AWS.
+Elle complète le pipeline DataFlow360 par un flux **API → Streaming → Traitement → Stockage** entièrement automatisé.
+
+### 1. Objectif
+
+Mettre en place un pipeline temps réel basé sur :
+
+* **Kinesis Stream** pour la collecte et le transport des données,
+* **Lambda** pour le traitement serverless,
+* **DynamoDB** pour le stockage NoSQL.
+
+Flux général :
+
+```
+OpenWeather API → AWS Kinesis → AWS Lambda → AWS DynamoDB
+```
+
+---
+
+### 2. Composants utilisés
+
+| Composant                     | Rôle                                                                                | Technologie     |
+| ----------------------------- | ----------------------------------------------------------------------------------- | --------------- |
+| **OpenWeather API**           | Source temps réel des données météo (qualité de l’air, température, humidité, etc.) | REST API        |
+| **AWS Kinesis (LocalStack)**  | Collecte et transporte les messages entrants en streaming                           | Cloud Streaming |
+| **AWS Lambda (LocalStack)**   | Fonction serverless qui consomme le flux Kinesis et écrit dans DynamoDB             | Cloud Function  |
+| **AWS DynamoDB (LocalStack)** | Base NoSQL pour le stockage persistant des données traitées                         | Cloud Database  |
+
+### 3. Mise en place sur LocalStack
+
+Avant de lancer les commandes suivantes, assurez-vous que :
+
+* LocalStack est démarré via Docker,
+* AWS CLI est configuré avec le profil `awslocal`,
+* Vous êtes dans l’environnement virtuel Python avec les dépendances installées.
+
+#### a. Créer un flux Kinesis
+
+```bash
+awslocal kinesis create-stream \
+  --stream-name weather_stream \
+  --shard-count 1
+```
+
+Vérifier :
+
+```bash
+awslocal kinesis list-streams
+```
+
+#### b. Créer la table DynamoDB
+
+```bash
+awslocal dynamodb create-table \
+  --table-name dataflow_mongo \
+  --attribute-definitions AttributeName=ville,AttributeType=S \
+  --key-schema AttributeName=ville,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST
+```
+
+Vérifier :
+
+```bash
+awslocal dynamodb list-tables
+```
+
+---
+
+#### c. Créer la fonction Lambda
+
+Compressez votre code Lambda :
+
+```bash
+zip lambda_consumer.zip lambda_consumer.py
+```
+
+Créez la fonction :
+
+```bash
+awslocal lambda create-function \
+  --function-name kinesis_to_dynamo \
+  --runtime python3.9 \
+  --handler lambda_consumer.lambda_handler \
+  --zip-file fileb://lambda_consumer.zip \
+  --role arn:aws:iam::000000000000:role/lambda-role
+```
+
+Vérifier :
+
+```bash
+awslocal lambda list-functions
+```
+
+---
+
+#### d. Lier Kinesis à Lambda
+
+```bash
+awslocal lambda create-event-source-mapping \
+  --function-name kinesis_to_dynamo \
+  --event-source arn:aws:kinesis:us-east-1:000000000000:stream/weather_stream \
+  --batch-size 1 \
+  --starting-position LATEST
+```
+
+Vérifier la liaison :
+
+```bash
+awslocal lambda list-event-source-mappings \
+  --function-name kinesis_to_dynamo
+```
+
+#### e. Tester le flux
+
+Envoyer un message simulé dans le flux :
+
+```bash
+aws --endpoint-url=http://localhost:4566 kinesis put-record \
+  --stream-name weather_stream \
+  --partition-key 1 \
+  --data '{"ville": "Dakar", "pays": "Sénégal", "aeroport": "DSS", "data": {"temp": 30, "pm2_5": 12}, "timestamp": 1731400000}'
+```
+
+Consulter les logs Lambda :
+
+```bash
+awslocal logs describe-log-groups
+awslocal logs tail /aws/lambda/kinesis_to_dynamo --follow
+```
+
+Vérifier l’insertion dans DynamoDB :
+
+```bash
+awslocal dynamodb scan --table-name dataflow_mongo
+```
